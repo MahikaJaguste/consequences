@@ -1,0 +1,31 @@
+import FungibleToken from 0x01
+import StreamToken from 0x02
+
+/// This transaction creates a StreamToken.Vault, saves it in signer's storage
+/// and links public & private capabilities
+///
+transaction {
+
+    prepare(signer: AuthAccount) {
+
+        if signer.borrow<&StreamToken.Stream>(from: StreamToken.StreamStoragePath) == nil {
+            // Create a new flowToken Vault and put it in storage
+            signer.save(<-StreamToken.createStream(netFlowRate: 1.0), to: StreamToken.StreamStoragePath)
+        }
+
+        if !signer.getCapability<&StreamToken.Stream>(
+            StreamToken.CheckBalancePath
+        ).check() {
+            // Unlink any capability that may exist there
+            signer.unlink(StreamToken.CheckBalancePath)
+            // Create a public capability to the Vault that only exposes the deposit function
+            // & balance field through the Receiver & Balance interface
+            signer.link<&StreamToken.Stream>(
+                StreamToken.CheckBalancePath,
+                target: StreamToken.StreamStoragePath
+            )
+        }
+
+    }
+}
+ 

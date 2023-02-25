@@ -1,0 +1,11 @@
+import FungibleToken from 0x01
+import StreamToken from 0x02
+
+/// Returns the balance of StreamToken in the Vault at the standar path
+/// in the specified address
+///
+pub fun main(of: Address): UFix64 {
+
+    return getAccount(of).getCapability<&StreamToken.Stream>(StreamToken.CheckBalancePath).borrow()?.getRealTimeBalance()
+    ?? panic("No StreamToken.Stream found at expected path in account ".concat(of.toString()))
+}

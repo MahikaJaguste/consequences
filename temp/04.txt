@@ -1,0 +1,22 @@
+import FungibleToken from 0x01
+import StreamToken from 0x02
+
+/// This transaction creates a StreamToken.Vault, saves it in signer's storage
+/// and links public & private capabilities
+///
+transaction {
+
+    prepare(signer: AuthAccount) {
+
+        let stream = signer.getCapability<
+            &StreamToken.Stream
+        >(
+            StreamToken.CheckBalancePath
+        ).borrow() ?? panic("No StreamToken.Stream found at expected path in account ")
+
+        stream.stop()
+        log("stream stopped")
+
+    }
+}
+ 
